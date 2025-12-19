@@ -121,7 +121,8 @@ def startRemoteBLE(name="remote"):
             
             time.sleep_ms(10)
                       
-            x, y = joyADC.read()
+            y, x = joyADC.read()
+            x=31-x
             
             if ( (oldYpos!=y) | (oldXpos!=x) ):
             
