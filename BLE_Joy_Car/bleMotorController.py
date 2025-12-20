@@ -12,6 +12,7 @@ import struct
 import time
 import json
 import math
+import sys
 import micropython
 from machine import Pin,PWM
 from ble_advertising import decode_services, decode_name
@@ -50,7 +51,7 @@ _UART_SERVICE_UUID = bluetooth.UUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
 _UART_RX_CHAR_UUID = bluetooth.UUID("6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
 _UART_TX_CHAR_UUID = bluetooth.UUID("6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
 
-led = machine.Pin(8, machine.Pin.OUT)
+connectedStatusLed = machine.Pin(8, machine.Pin.OUT)
 rxString="Empty"
 
 
@@ -136,7 +137,7 @@ class BLESimpleCentral:
                     self._conn_handle, self._start_handle, self._end_handle
                 )
             else:
-                print("Failed to find uart service.")
+                print("FaiconnectedStatusLed to find uart service.")
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
             # Connected device returned a characteristic.
@@ -153,7 +154,7 @@ class BLESimpleCentral:
                 if self._conn_callback:
                     self._conn_callback()
             else:
-                print("Failed to find uart rx characteristic.")
+                print("FaiconnectedStatusLed to find uart rx characteristic.")
 
         elif event == _IRQ_GATTC_WRITE_DONE:
             conn_handle, value_handle, status = data
@@ -240,7 +241,6 @@ def startBleMotorControl(connectName="remote"):
     #Wait for PWM init
     time.sleep_ms(40)
 
-
     MotorDirForward = 0
 
     ble = bluetooth.BLE()
@@ -266,7 +266,7 @@ def startBleMotorControl(connectName="remote"):
 
     # Wait for connection...
     while not central.is_connected():
-        led.value(1)
+        connectedStatusLed.value(1)
         time.sleep_ms(100)
         if not_found:
             return
@@ -315,7 +315,7 @@ def startBleMotorControl(connectName="remote"):
     central.on_notify(on_rx)
 
     with_response = False
-
+    connectedStatusLed.value(0) #Turn Connected to joy-led on
     i = 0
     while central.is_connected():
         
@@ -330,12 +330,18 @@ def startBleMotorControl(connectName="remote"):
         time.sleep_ms(40)
         
     print("Disconnected")
-    led.value(0)
+    connectedStatusLed.value(1) #Turn Connected to joy-led off
 
 
 
 if __name__ == "__main__":
-    led.value(0)
+    ver = sys.implementation.version  # tuple: (major, minor, micro)
+
+    if ver < (1, 27, 0):
+        print("MicroPython version is lower than v1.27")
+        print("Please upgrade due to error using the inbuild LED")
+            
+    connectedStatusLed.value(1) #Turn Connected to joy-led off
     while(True) :
         startBleMotorControl(connectName="Rem#10")
     
