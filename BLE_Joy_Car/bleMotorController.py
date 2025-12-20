@@ -220,25 +220,26 @@ def linearRegressionValue(x):
 
 
 def startBleMotorControl(connectName="remote"):
-    servo=PWM(Pin(10),freq=50)
-    #servo.freq(50)    
+
+    servo      = PWM(Pin(10),freq=50 )
+    MotorSpeed = PWM(Pin(5) ,freq=100)
+    MotorSpeed.duty(0)
     
-    
+    #Steering servo control param
     servoPosMid=4512
     servoPosMax=7000
     servoPosMin=2024  
 
-    #servo.duty_u16(int(2024+(5000*8/16)))
+    #Set steering wheel facing forward
     servo.duty_u16(linearRegressionValue(15))
 
+    #Enable DC-Motor control
     MotorPinIN1=Pin(6,Pin.OUT,drive=Pin.DRIVE_3)
-    #MotorPinIN2=Pin(5,Pin.OUT,drive=Pin.DRIVE_3)
     MotorPinIN1.off()   #off- forward on -Backword
-    #MotorPinIN2.off()
 
-    MotorSpeed=PWM(Pin(5,Pin.OUT),freq=100)
-    #MotorSpeed.freq(400)
-    MotorSpeed.duty(100)
+    #Wait for PWM init
+    time.sleep_ms(40)
+
 
     MotorDirForward = 0
 
