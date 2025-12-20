@@ -48,7 +48,7 @@ _UART_SERVICE = (
     (_UART_TX, _UART_RX),
 )
 
-led = machine.Pin("LED", machine.Pin.OUT)
+connectedLed = machine.Pin("LED", machine.Pin.OUT)
 
 class BLESimplePeripheral:
     def __init__(self, ble, name="mpy-uart"):
@@ -65,12 +65,12 @@ class BLESimplePeripheral:
         # Track connections so we can send notifications.
         if event == _IRQ_CENTRAL_CONNECT:
             conn_handle, _, _ = data
-            led.value(1)
             print("New connection", conn_handle)
+            connectedLed.on()   # set BLE connect led indicator on
             self._connections.add(conn_handle)
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
-            led.value(0)
+            connectedLed.off()   # Ensure the the BLE connect led indicator is off
             print("Disconnected", conn_handle)
             self._connections.remove(conn_handle)
             # Start advertising again to allow a new connection.
@@ -85,7 +85,7 @@ class BLESimplePeripheral:
         for conn_handle in self._connections:
             self._ble.gatts_notify(conn_handle, self._handle_tx, data)
 
-    def is_connected(self):        
+    def is_connected(self):
         return len(self._connections) > 0
 
     def _advertise(self, interval_us=100000):
@@ -97,6 +97,7 @@ class BLESimplePeripheral:
 
 
 def startRemoteBLE(name="remote"):
+    connectedLed.off()   # Ensure the the BLE connect led indicator is off
     ble = bluetooth.BLE()
     p = BLESimplePeripheral(ble,name=name)
 
