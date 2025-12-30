@@ -220,10 +220,15 @@ def linearRegressionValue(x):
     return (int)  (a * x + b)
 
 
-def startBleMotorControl(connectName="remote"):
+def startBleMotorControl(connectName="remote",ver=1):
 
     servo      = PWM(Pin(10),freq=50 )
+    
     MotorSpeed = PWM(Pin(5) ,freq=100)
+    
+    if(ver==2) : 
+        MotorSpeed = PWM(Pin(3) ,freq=100)
+    
     MotorSpeed.duty(0)
     
     #Steering servo control param
