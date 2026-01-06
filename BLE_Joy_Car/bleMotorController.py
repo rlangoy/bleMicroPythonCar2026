@@ -287,17 +287,17 @@ def startBleMotorControl(connectName="remote",ver=1):
             
             if('X' in rxJson) :
                 x=rxJson['X']
-                servo.duty_u16(linearRegressionValue(31-x))
+                servo.duty_u16(linearRegressionValue(x))
 
             if('Y' in rxJson) :
                 y=rxJson['Y']
                 
                 y=y-15 # negative speed = backward
                 if (y>=0) :
-                    print("Forward")
+                    #print("Forward")
                     MotorPinIN1.off()   #off- forward
                 else :
-                    print("Reverse")
+                    #print("Reverse")
                     MotorPinIN1.on()
                 
                 if(y!=0) :
